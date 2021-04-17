@@ -1,3 +1,4 @@
 media/csv/
+static/admin
 app/__pycache__/
 app/migrations/__pycache__/
