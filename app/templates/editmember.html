@@ -1,0 +1,25 @@
+{% load static %}
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
+</head>
+<body class="container">
+    <h1 class="display-4 text-primary">{{title}}</h1>
+    <p>{{msg}}</p>
+    <form action="{% url 'editmember' id %}" method="POST">
+    {% csrf_token %}
+    <table class="table">
+    {{ form.as_table }}
+        <tr><th>Password(確認):<td>
+            <input type="password" name="chkpass" class="form-control" required id="id_chkpass">
+        </td></th></tr>
+        <tr><th><td>
+            <input type="submit" value="click" class="btn btn-primary mt-2">
+        </td></th></tr>
+    </table>
+    </form>
+</body>
+</html>

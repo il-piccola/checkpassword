@@ -1,0 +1,3 @@
+media/csv/
+app/__pycache__/
+app/migrations/__pycache__/
