@@ -13,9 +13,10 @@
     {% csrf_token %}
     <table class="table">
         <tr><th>Email</th><td>{{data.mail}}</td></tr>
-        <tr><th><td>
-            <input type="submit" value="click" class="btn btn-primary mt-2">
-        </td></th></tr>
+        <tr><td></td><td>
+            <input type="submit" value="登録" class="btn btn-primary mt-2">
+            <button type="button" onclick="history.back()" class="btn btn-primary mt-2">戻る</button>
+        </td></tr>
     </table>
     </form>
 </body>
