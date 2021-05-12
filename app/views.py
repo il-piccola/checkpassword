@@ -28,13 +28,16 @@ def login(request) :
             params['msg'] = '未登録のメールアドレスです'
         else :
             item = data.first()
-            key = base64.urlsafe_b64encode(KEYSTR.encode())
-            token = item.password.encode()
-            password = str(Fernet(key).decrypt(token).decode())
-            if password != request.POST['password'] :
-                params['msg'] = 'パスワードが正しくありません'
+            if item.approval == False :
+                params['msg'] = 'こちらからの電話確認後にユーザ認証されるまでお待ちください'
             else :
-                return redirect('http://www.yahoo.co.jp')
+                key = base64.urlsafe_b64encode(KEYSTR.encode())
+                token = item.password.encode()
+                password = str(Fernet(key).decrypt(token).decode())
+                if password != request.POST['password'] :
+                    params['msg'] = 'パスワードが正しくありません'
+                else :
+                    return redirect('http://www.yahoo.co.jp')
     else :
         params['msg'] = '入力に誤りがあります'
     params['form'] = form
@@ -92,7 +95,7 @@ def addconfirm(request) :
         member = Member(mail=mail, password=encodepassword(password))
         member.save()
         request.session.clear()
-        request.session['msg'] = '電話確認後にユーザ認証されるまでお待ちください'
+        request.session['msg'] = 'ユーザ登録の申し込みを受け付けました'
         return redirect(to='login')
     data = Member(mail=mail, password=password)
     params = {
@@ -101,6 +104,20 @@ def addconfirm(request) :
         'data' : data,
     }
     return render(request, 'addconfirm.html', params)
+
+def addapproval(request, num) :
+    member = Member.objects.get(id=num)
+    if (request.method == 'POST') :
+        member.time = datetime.datetime.now()
+        member.approval = True
+        member.save()
+        return redirect(to='listmember')
+    params = {
+        'title' : 'Approve User',
+        'msg' : '以下のユーザ登録を承認します',
+        'data' : member,
+    }
+    return render(request, 'addapproval.html', params)
 
 def editmember(request, num) :
     obj = Member.objects.get(id=num)

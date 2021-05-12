@@ -8,6 +8,7 @@ class Member(models.Model) :
     mail = models.EmailField(max_length=200)
     password = models.CharField(max_length=200)
     time = models.DateTimeField(default=timezone.now)
+    approval = models.BooleanField(default=False)
 
 def getuploadpath(instance, filename) :
     newname = datetime.datetime.now().strftime('%Y%m%d_%H%M%S_') + filename

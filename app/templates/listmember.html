@@ -18,14 +18,26 @@
             <td></td><td></td>
             <td><a href="{% url 'addfromcsv' %}">CSV取込</a></td>
         </tr>
-        <tr><th>EMail</th><th>Date</th><td></td></tr>
+        <tr><th>EMail</th><th>Date</th><th>承認</th><td></td></tr>
     {% for item in data %}
         <tr>
             <td>{{item.mail}}</td>
             <td>{{item.time}}</td>
             <td>
+                {% if item.approval == True%}
+                承認済
+                {% else %}
+                未承認
+                {% endif %}
+            </td>
+            <td>
+                {% if item.approval == True%}
                 <a href="{% url 'editmember' item.id %}">更新</a>　
                 <a href="{% url 'delmember' item.id %}">削除</a>
+                {% else %}
+                <a href="{% url 'addapproval' item.id %}">承認</a>　
+                <a href="{% url 'delmember' item.id %}">削除</a>
+                {% endif %}
             </td>
         </tr>
     {% endfor %}
