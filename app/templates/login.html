@@ -9,13 +9,14 @@
 <body class="container">
     <h1 class="display-4 text-primary">{{title}}</h1>
     <p>{{msg}}</p>
+    <div align="right"><a href="{% url 'addmember' %}">ユーザ登録申込</a></div>
     <form action="{% url 'login' %}" method="POST">
     {% csrf_token %}
     <table class="table">
     {{ form.as_table }}
-        <tr><th><td>
+        <tr><td></td><td>
             <input type="submit" value="click" class="btn btn-primary mt-2">
-        </td></th></tr>
+        </td></tr>
     </table>
     </form>
 </body>

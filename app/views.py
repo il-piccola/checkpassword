@@ -15,6 +15,9 @@ def login(request) :
         'msg' : '',
         'form' : MemberForm(),
     }
+    if 'msg' in request.session :
+        params['msg'] = request.session['msg']
+        request.session.clear()
     if (request.method != 'POST') :
         return render(request, 'login.html', params)
     obj = Member()
@@ -89,11 +92,12 @@ def addconfirm(request) :
         member = Member(mail=mail, password=encodepassword(password))
         member.save()
         request.session.clear()
-        return redirect(to='listmember')
+        request.session['msg'] = '電話確認後にユーザ認証されるまでお待ちください'
+        return redirect(to='login')
     data = Member(mail=mail, password=password)
     params = {
         'title' : 'Regist User',
-        'msg' : '以下のユーザを登録します',
+        'msg' : '以下の通りユーザ登録を申し込みます',
         'data' : data,
     }
     return render(request, 'addconfirm.html', params)
@@ -104,7 +108,7 @@ def editmember(request, num) :
     form.fields['mail'].widget.attrs['readonly'] = 'readonly'
     params = {
         'title' : 'Update User',
-        'msg' : 'ユーザのパスワードを変更します',
+        'msg' : 'ユーザ情報を変更します',
         'form' : form,
         'id' : obj.id,
     }
