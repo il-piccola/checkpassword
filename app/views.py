@@ -77,6 +77,7 @@ def addmember(request) :
         'form' : MemberForm(),
     }
     if (request.method != 'POST') :
+        params['msg'] = 'ユーザ登録申し込み後にこちらから確認の電話をさせていただきます'
         return render(request, 'addmember.html', params)
     obj = Member()
     form = MemberForm(data=request.POST, instance=obj)
@@ -96,6 +97,8 @@ def addmember(request) :
             request.session['position'] = request.POST['position']
             request.session['password'] = request.POST['password']
             return redirect(to='addconfirm')
+    elif len(request.POST['password']) < 6 :
+        params['msg'] = 'パスワードは6文字以上にしてください'
     else :
         params['msg'] = '入力に誤りがあります'
     params['form'] = form
@@ -115,7 +118,7 @@ def addconfirm(request) :
             , organization=organization, position=position, password=encodepassword(password))
         member.save()
         request.session.clear()
-        request.session['msg'] = 'ユーザ登録の申し込みを受け付けました'
+        request.session['msg'] = 'ユーザ登録の申し込みを受け付けました、こちらからの電話確認をお待ちください'
         return redirect(to='login')
     data = Member(name=name, kana=kana, mail=mail, tel1=tel1, tel2=tel2
         , organization=organization, position=position, password=password)

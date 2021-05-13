@@ -10,8 +10,9 @@
     <h1 class="display-4 text-primary">{{title}}</h1>
     <form action="{% url 'listmember' %}" method="POST" class="form-inline">
     {% csrf_token %}
-    {{ form }}
-        <input type="submit" value="click" class="btn btn-primary mt-2">
+        　　<b>検索</b>　　{{ form.search }}
+        　　<b>ソート</b>　　{{ form.order }}{{ form.reverse }}
+        　　<input type="submit" value="click" class="btn btn-primary mt-2">
     </form>
     <table class="table">
         <!--
