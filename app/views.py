@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.db.models import Q
 from cryptography.fernet import Fernet
 import os
 import csv
@@ -13,7 +14,7 @@ def login(request) :
     params = {
         'title' : 'Login',
         'msg' : '',
-        'form' : MemberForm(),
+        'form' : LoginForm(),
     }
     if 'msg' in request.session :
         params['msg'] = request.session['msg']
@@ -21,7 +22,7 @@ def login(request) :
     if (request.method != 'POST') :
         return render(request, 'login.html', params)
     obj = Member()
-    form = MemberForm(data=request.POST, instance=obj)
+    form = LoginForm(data=request.POST, instance=obj)
     if form.is_valid() :
         data = Member.objects.filter(mail=request.POST['mail'])
         if data.count() <= 0 :
@@ -53,9 +54,15 @@ def listmember(request) :
     if (request.method != 'POST') :
         return render(request, 'listmember.html', params)
     if len(request.POST['search']) > 0 :
-        data = Member.objects.filter(mail__icontains=request.POST['search']).reverse()
-    if request.POST['order'] == 'mail' :
+        data = Member.objects.filter(
+            Q(kana__icontains=request.POST['search']) | Q(mail__icontains=request.POST['search'])
+        )
+    if request.POST['order'] == 'kana' :
+        data = data.order_by('kana')
+    elif request.POST['order'] == 'mail' :
         data = data.order_by('mail')
+    elif request.POST['order'] == 'approval' :
+        data = data.order_by('approval')
     if request.POST['reverse'] == 'off' :
         data = data.reverse()
     form = SearchForm(data=request.POST)
@@ -65,7 +72,7 @@ def listmember(request) :
 
 def addmember(request) :
     params = {
-        'title' : 'New User',
+        'title' : 'Registration',
         'msg' : '',
         'form' : MemberForm(),
     }
@@ -80,7 +87,13 @@ def addmember(request) :
         elif request.POST['password'] != request.POST['chkpass'] :
             params['msg'] = 'パスワードが一致しません'
         else :
+            request.session['name'] = request.POST['name']
+            request.session['kana'] = request.POST['kana']
             request.session['mail'] = request.POST['mail']
+            request.session['tel1'] = request.POST['tel1']
+            request.session['tel2'] = request.POST['tel2']
+            request.session['organization'] = request.POST['organization']
+            request.session['position'] = request.POST['position']
             request.session['password'] = request.POST['password']
             return redirect(to='addconfirm')
     else :
@@ -89,17 +102,25 @@ def addmember(request) :
     return render(request, 'addmember.html', params)
 
 def addconfirm(request) :
+    name = request.session['name']
+    kana = request.session['kana']
     mail = request.session['mail']
+    tel1 = request.session['tel1']
+    tel2 = request.session['tel2']
+    organization = request.session['organization']
+    position = request.session['position']
     password = request.session['password']
     if (request.method == 'POST') :
-        member = Member(mail=mail, password=encodepassword(password))
+        member = Member(name=name, kana=kana, mail=mail, tel1=tel1, tel2=tel2
+            , organization=organization, position=position, password=encodepassword(password))
         member.save()
         request.session.clear()
         request.session['msg'] = 'ユーザ登録の申し込みを受け付けました'
         return redirect(to='login')
-    data = Member(mail=mail, password=password)
+    data = Member(name=name, kana=kana, mail=mail, tel1=tel1, tel2=tel2
+        , organization=organization, position=position, password=password)
     params = {
-        'title' : 'Regist User',
+        'title' : 'Confirmation',
         'msg' : '以下の通りユーザ登録を申し込みます',
         'data' : data,
     }
@@ -113,7 +134,7 @@ def addapproval(request, num) :
         member.save()
         return redirect(to='listmember')
     params = {
-        'title' : 'Approve User',
+        'title' : 'Approval',
         'msg' : '以下のユーザ登録を承認します',
         'data' : member,
     }
@@ -124,7 +145,7 @@ def editmember(request, num) :
     form = MemberForm(instance=obj)
     form.fields['mail'].widget.attrs['readonly'] = 'readonly'
     params = {
-        'title' : 'Update User',
+        'title' : 'Update',
         'msg' : 'ユーザ情報を変更します',
         'form' : form,
         'id' : obj.id,
@@ -134,8 +155,15 @@ def editmember(request, num) :
     if request.POST['password'] != request.POST['chkpass'] :
         params['msg'] = 'パスワードが一致しません'
     else :
+        name = request.POST['name']
+        kana = request.POST['kana']
+        tel1 = request.POST['tel1']
+        tel2 = request.POST['tel2']
+        organization = request.POST['organization']
+        position = request.POST['position']
         password = encodepassword(request.POST['password'])
-        member = Member(id=obj.id, mail=obj.mail, password=password)
+        member = Member(id=obj.id, name=name, kana=kana, mail=obj.mail, tel1=tel1, tel2=tel2
+            , organization=organization, position=position, password=password)
         member.save()
         return redirect(to='listmember')
     return render(request, 'editmember.html', params)
@@ -146,7 +174,7 @@ def delmember(request, num) :
         obj.delete()
         return redirect(to='listmember')
     params = {
-        'title' : 'Delete User',
+        'title' : 'Delete',
         'msg' : '以下のユーザを削除します',
         'data' : obj,
     }

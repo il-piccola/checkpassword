@@ -14,20 +14,23 @@
         <input type="submit" value="click" class="btn btn-primary mt-2">
     </form>
     <table class="table">
+        <!--
         <tr>
-            <td></td><td></td>
+            <td></td><td></td><td></td><td></td>
             <td><a href="{% url 'addfromcsv' %}">CSV取込</a></td>
         </tr>
-        <tr><th>EMail</th><th>Date</th><th>承認</th><td></td></tr>
+        -->
+        <tr><th>名前(カナ)</th><th>メールアドレス</th><th>日時</th><th>承認</th><td></td></tr>
     {% for item in data %}
         <tr>
+            <td>{{item.kana}}</td>
             <td>{{item.mail}}</td>
             <td>{{item.time}}</td>
             <td>
                 {% if item.approval == True%}
                 承認済
                 {% else %}
-                未承認
+                <div class="text-danger"><b>未承認</b></div>
                 {% endif %}
             </td>
             <td>
