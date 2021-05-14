@@ -118,7 +118,7 @@ def addconfirm(request) :
             , organization=organization, position=position, password=encodepassword(password))
         member.save()
         request.session.clear()
-        request.session['msg'] = 'ユーザ登録の申し込みを受け付けました、こちらからの電話確認をお待ちください'
+        request.session['msg'] = 'ユーザ登録の申し込みを受け付けました。こちらからの電話確認をお待ちください。'
         return redirect(to='login')
     data = Member(name=name, kana=kana, mail=mail, tel1=tel1, tel2=tel2
         , organization=organization, position=position, password=password)
