@@ -82,9 +82,9 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'il-piccola-0001_checkpassword',
-        'USER': 'il-piccola-0001',
-        'PASSWORD': 'il-piccola-0001',
+        'NAME': 'yukawa_checkpassword',
+        'USER': 'yukawa',
+        'PASSWORD': 'GPSA-2021s',
         'HOST': 'db',
         'PORT': '3306',
     }
