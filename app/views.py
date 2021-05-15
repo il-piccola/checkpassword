@@ -32,10 +32,7 @@ def login(request) :
             if item.approval == False :
                 params['msg'] = 'こちらからの電話確認後にユーザ認証されるまでお待ちください'
             else :
-                key = base64.urlsafe_b64encode(KEYSTR.encode())
-                token = item.password.encode()
-                password = str(Fernet(key).decrypt(token).decode())
-                if password != request.POST['password'] :
+                if decodepassword(item.password) != request.POST['password'] :
                     params['msg'] = 'パスワードが正しくありません'
                 else :
                     return redirect('http://www.yahoo.co.jp')
@@ -140,36 +137,33 @@ def addapproval(request, num) :
         'title' : 'Approval',
         'msg' : '以下のユーザ登録を承認します',
         'data' : member,
+        'password' : decodepassword(member.password),
     }
     return render(request, 'addapproval.html', params)
 
 def editmember(request, num) :
     obj = Member.objects.get(id=num)
-    form = MemberForm(instance=obj)
-    form.fields['mail'].widget.attrs['readonly'] = 'readonly'
-    params = {
-        'title' : 'Update',
-        'msg' : 'ユーザ情報を変更します',
-        'form' : form,
-        'id' : obj.id,
-    }
     if (request.method != 'POST') :
+        form = MemberForm(instance=obj)
+        form.fields['mail'].widget.attrs['readonly'] = 'readonly'
+        params = {
+            'title' : 'Update',
+            'msg' : 'ユーザ情報を変更します',
+            'form' : form,
+            'id' : obj.id,
+            'password' : decodepassword(obj.password),
+        }
         return render(request, 'editmember.html', params)
-    if request.POST['password'] != request.POST['chkpass'] :
-        params['msg'] = 'パスワードが一致しません'
-    else :
-        name = request.POST['name']
-        kana = request.POST['kana']
-        tel1 = request.POST['tel1']
-        tel2 = request.POST['tel2']
-        organization = request.POST['organization']
-        position = request.POST['position']
-        password = encodepassword(request.POST['password'])
-        member = Member(id=obj.id, name=name, kana=kana, mail=obj.mail, tel1=tel1, tel2=tel2
-            , organization=organization, position=position, password=password)
-        member.save()
-        return redirect(to='listmember')
-    return render(request, 'editmember.html', params)
+    name = request.POST['name']
+    kana = request.POST['kana']
+    tel1 = request.POST['tel1']
+    tel2 = request.POST['tel2']
+    organization = request.POST['organization']
+    position = request.POST['position']
+    member = Member(id=obj.id, name=name, kana=kana, mail=obj.mail, tel1=tel1, tel2=tel2
+        , organization=organization, position=position, password=obj.password, approval=obj.approval)
+    member.save()
+    return redirect(to='listmember')
 
 def delmember(request, num) :
     obj = Member.objects.get(id=num)
@@ -202,6 +196,11 @@ def encodepassword(password) :
     key = base64.urlsafe_b64encode(KEYSTR.encode())
     token = Fernet(key).encrypt(password.encode())
     return str(token.decode())
+
+def decodepassword(passtoken) :
+    key = base64.urlsafe_b64encode(KEYSTR.encode())
+    token = passtoken.encode()
+    return str(Fernet(key).decrypt(token).decode())
 
 def csvregist(form) :
     form.save()

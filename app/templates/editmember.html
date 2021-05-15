@@ -12,9 +12,16 @@
     <form action="{% url 'editmember' id %}" method="POST">
     {% csrf_token %}
     <table class="table">
-    {{ form.as_table }}
-        <tr><th>パスワード(確認):<td>
-            <input type="password" name="chkpass" class="form-control" required id="id_chkpass">
+    <!--{{ form.as_table }}-->
+        <tr><th>氏名</th><td>{{form.name}}</td></tr>
+        <tr><th>氏名(カナ)</th><td>{{form.kana}}</td></tr>
+        <tr><th>メールアドレス</th><td>{{form.mail}}</td></tr>
+        <tr><th>電話番号</th><td>{{form.tel1}}</td></tr>
+        <tr><th>電話番号(個人)</th><td>{{form.tel2}}</td></tr>
+        <tr><th>勤務先</th><td>{{form.organization}}</td></tr>
+        <tr><th>役職</th><td>{{form.position}}</td></tr>
+        <tr><th>パスワード:<td>
+            <input type="text" name="chkpass" value={{password}} class="form-control" required id="id_chkpass" readonly="readonly">
         </td></th></tr>
         <tr><th><td>
             <input type="submit" value="更新" class="btn btn-primary mt-2">
