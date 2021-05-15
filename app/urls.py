@@ -24,6 +24,7 @@ urlpatterns = [
     path('addconfirm/', views.addconfirm, name='addconfirm'),
     path('addapproval/<int:num>', views.addapproval, name='addapproval'),
     path('editmember/<int:num>', views.editmember, name='editmember'),
+    path('editconfirm/', views.editconfirm, name='editconfirm'),
     path('delmember/<int:num>', views.delmember, name='delmember'),
     path('addfromcsv/', views.addfromcsv, name='addfromcsv'),
     path('login/', views.login, name='login'),

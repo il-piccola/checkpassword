@@ -154,16 +154,36 @@ def editmember(request, num) :
             'password' : decodepassword(obj.password),
         }
         return render(request, 'editmember.html', params)
-    name = request.POST['name']
-    kana = request.POST['kana']
-    tel1 = request.POST['tel1']
-    tel2 = request.POST['tel2']
-    organization = request.POST['organization']
-    position = request.POST['position']
+    request.session['id'] = num
+    request.session['name'] = request.POST['name']
+    request.session['kana'] = request.POST['kana']
+    request.session['tel1'] = request.POST['tel1']
+    request.session['tel2'] = request.POST['tel2']
+    request.session['organization'] = request.POST['organization']
+    request.session['position'] = request.POST['position']
+    return redirect(to='editconfirm')
+
+def editconfirm(request) :
+    obj = Member.objects.get(id=request.session['id'])
+    name = request.session['name']
+    kana = request.session['kana']
+    tel1 = request.session['tel1']
+    tel2 = request.session['tel2']
+    organization = request.session['organization']
+    position = request.session['position']
     member = Member(id=obj.id, name=name, kana=kana, mail=obj.mail, tel1=tel1, tel2=tel2
         , organization=organization, position=position, password=obj.password, approval=obj.approval)
-    member.save()
-    return redirect(to='listmember')
+    if (request.method == 'POST') :
+        member.save()
+        request.session.clear()
+        return redirect(to='listmember')
+    params = {
+        'title' : 'Confirmation',
+        'msg' : '以下の通りユーザ情報を更新します',
+        'data' : member,
+        'password' : decodepassword(obj.password),
+    }
+    return render(request, 'editconfirm.html', params)
 
 def delmember(request, num) :
     obj = Member.objects.get(id=num)
