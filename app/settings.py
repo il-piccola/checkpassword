@@ -137,6 +137,14 @@ KEYSTR = "QUFBQUFCQkJCQkNDQ0NDRERERERFRUVF"
 
 REMAIN_CSV = 100
 
+MAILADDRESS = "yukawa@yukawa.sakura.ne.jp"
+MAILSUBJECT = "サイト会員登録申込"
+
+EMAIL_HOST = "yukawa.sakura.ne.jp"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "yukawa@yukawa.sakura.ne.jp"
+EMAIL_HOST_PASSWORD = "GPSA2021s"
+EMAIL_USE_TLS = False
 
 LOG_BASE_DIR = os.path.join(BASE_DIR, 'log')
 LOGGING = {

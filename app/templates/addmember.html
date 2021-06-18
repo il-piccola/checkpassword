@@ -12,19 +12,28 @@
     <form action="{% url 'addmember' %}" method="POST">
     {% csrf_token %}
     <table class="table">
-        <tr><th>氏名<div class="text-danger">(必須)</div></th><td>{{form.name}}</td></tr>
-        <tr><th>氏名(カナ)<div class="text-danger">(必須)</div></th><td>{{form.kana}}</td></tr>
-        <tr><th>メールアドレス<div class="text-danger">(必須)</div></th><td>{{form.mail}}</td></tr>
-        <tr><th>電話番号<div class="text-danger">(必須)</div></th><td>{{form.tel1}}</td></tr>
-        <tr><th>電話番号(個人)</th><td>{{form.tel2}}</td></tr>
-        <tr><th>勤務先<div class="text-danger">(必須)</div></th><td>{{form.organization}}</td></tr>
-        <tr><th>役職</th><td>{{form.position}}</td></tr>
-        <tr><th>パスワード(6文字以上)<div class="text-danger">(必須)</div></th><td>{{form.password}}</td></tr>
-        <tr><th>パスワード(確認):</th><td>
+        <tr><th><span class="text-success">個人情報</span></th><td></td></tr>
+        <tr><th>氏名<span class="text-danger">(必須)</span></th><td>{{form.name}}</td></tr>
+        <tr><th>氏名(カナ)<span class="text-danger">(必須)</span></th><td>{{form.kana}}</td></tr>
+        <tr><th>個人電話番号<span class="text-danger">(必須)</span></th><td>{{form.tel1}}</td></tr>
+        <tr><th>メールアドレス<span class="text-danger">(必須)</span></th><td>{{form.mail}}</td></tr>
+        <tr><th>パスワード(6文字以上)<span class="text-danger">(必須)</span></th><td>{{form.password}}</td></tr>
+        <tr><th>パスワード(確認)</th><td>
             <input type="password" name="chkpass" class="form-control" minlength="5" required id="id_chkpass">
         </td></tr>
+        <tr><th><span class="text-success">勤務先情報</span></th><td></td></tr>
+        <tr><th>勤務先<span class="text-danger">(必須)</span></th><td>{{form.organization}}</td></tr>
+        <tr><th>資格、役職<span class="text-danger">(必須)</span></th><td>{{form.position}}</td></tr>
+        <tr><th>勤務先電話番号<span class="text-danger">(必須)</span></th><td>{{form.tel2}}</td></tr>
+        <tr><th>都道府県<span class="text-danger">(必須)</span></th><td>{{form.prefectures}}</td></tr>
+        <tr><th>規模<span class="text-danger">(必須)</span></th><td>{{form.scale}}</td></tr>
+        <tr><td><b>その他<span class="text-danger">(必須)</span></b><br>
+            現在一番悩んでいること　知りたいこと　伝えたいこと等　自由にお書きください<br>
+            マスターには残しますがサイトに載せることはしません<br>
+            書くことがない場合は「特になし」とお書きください
+            </td><td>{{form.others}}</td></tr>
         <tr><th><td>
-            <input type="submit" value="申込" class="btn btn-primary mt-2">
+            <input type="submit" value="次へ" class="btn btn-primary mt-2">
             <button type="button" onclick="history.back()" class="btn btn-primary mt-2">戻る</button>
         </td></th></tr>
     </table>

@@ -21,6 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('listmember/', views.listmember, name='listmember'),
     path('addmember/', views.addmember, name='addmember'),
+    path('addschedule/', views.addschedule, name='addschedule'),
     path('addconfirm/', views.addconfirm, name='addconfirm'),
     path('addapproval/<int:num>', views.addapproval, name='addapproval'),
     path('editmember/<int:num>', views.editmember, name='editmember'),

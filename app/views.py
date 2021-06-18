@@ -1,12 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.db.models import Q
+from django.core.mail import send_mail
 from cryptography.fernet import Fernet
 import os
 import csv
 import base64
-from .settings import KEYSTR, REMAIN_CSV
+import datetime
+from .settings import KEYSTR, REMAIN_CSV, MAILADDRESS, MAILSUBJECT, EMAIL_HOST_USER
 from .models import *
 from .forms import *
 
@@ -87,13 +88,16 @@ def addmember(request) :
         else :
             request.session['name'] = request.POST['name']
             request.session['kana'] = request.POST['kana']
-            request.session['mail'] = request.POST['mail']
             request.session['tel1'] = request.POST['tel1']
-            request.session['tel2'] = request.POST['tel2']
+            request.session['mail'] = request.POST['mail']
+            request.session['password'] = request.POST['password']
             request.session['organization'] = request.POST['organization']
             request.session['position'] = request.POST['position']
-            request.session['password'] = request.POST['password']
-            return redirect(to='addconfirm')
+            request.session['tel2'] = request.POST['tel2']
+            request.session['prefectures'] = request.POST['prefectures']
+            request.session['scale'] = request.POST['scale']
+            request.session['others'] = request.POST['others']
+            return redirect(to='addschedule')
     elif len(request.POST['password']) < 6 :
         params['msg'] = 'パスワードは6文字以上にしてください'
     else :
@@ -101,28 +105,72 @@ def addmember(request) :
     params['form'] = form
     return render(request, 'addmember.html', params)
 
+def addschedule(request) :
+    params = {
+        'title' : 'Schedule',
+        'msg' : '',
+        'form' : ScheduleForm(),
+    }
+    if (request.method != 'POST') :
+        params['msg'] = '明後日より一週間の予定を記入してください(日曜日　祝日は不要です)'
+        return render(request, 'addschedule.html', params)
+    txt = "月日,場所,電話番号,電話が許される時間,電話を取った方に伝える貴方の立場\r\n"
+    for i in range(1, 8) :
+        if request.POST['date'+str(i)] == "" :
+            txt += "--,"
+        else :
+            pday = datetime.datetime.strptime(request.POST['date'+str(i)], "%Y-%m-%d")
+            sday = convertweekday(datetime.datetime.strftime(pday, "%m月%d日(%a)"))
+            txt += sday+","
+        if request.POST['place'+str(i)] == "" :
+            txt += "--,"
+        else :
+            txt += request.POST['place'+str(i)]+","
+        if request.POST['tel'+str(i)] == "" :
+            txt += "--,"
+        else :
+            txt += request.POST['tel'+str(i)]+","
+        if request.POST['time'+str(i)] == "" :
+            txt += "--,"
+        else :
+            txt += request.POST['time'+str(i)]+","
+        if request.POST['position'+str(i)] == "" :
+            txt += "--\r\n"
+        else :
+            txt += request.POST['position'+str(i)]+"\r\n"
+    request.session['schedule'] = txt
+    return redirect(to='addconfirm')
+
 def addconfirm(request) :
     name = request.session['name']
     kana = request.session['kana']
-    mail = request.session['mail']
     tel1 = request.session['tel1']
-    tel2 = request.session['tel2']
+    mail = request.session['mail']
+    password = request.session['password']
     organization = request.session['organization']
     position = request.session['position']
-    password = request.session['password']
+    tel2 = request.session['tel2']
+    prefectures = request.session['prefectures']
+    scale = request.session['scale']
+    others = request.session['others']
+    txt = request.session['schedule']
     if (request.method == 'POST') :
-        member = Member(name=name, kana=kana, mail=mail, tel1=tel1, tel2=tel2
-            , organization=organization, position=position, password=encodepassword(password))
+        member = Member(name=name, kana=kana, tel1=tel1, mail=mail, password=encodepassword(password)
+            , organization=organization, position=position, tel2=tel2, prefectures=prefectures
+            , scale=scale, others=others)
+        sendapplicationmail(member, txt)
         member.save()
         request.session.clear()
         request.session['msg'] = 'ユーザ登録の申し込みを受け付けました。こちらからの電話確認をお待ちください。'
         return redirect(to='login')
-    data = Member(name=name, kana=kana, mail=mail, tel1=tel1, tel2=tel2
-        , organization=organization, position=position, password=password)
+    data = Member(name=name, kana=kana, tel1=tel1, mail=mail, password=password
+        , organization=organization, position=position, tel2=tel2, prefectures=prefectures
+        , scale=scale, others=others)
     params = {
         'title' : 'Confirmation',
         'msg' : '以下の通りユーザ登録を申し込みます',
         'data' : data,
+        'schedule' : txt,
     }
     return render(request, 'addconfirm.html', params)
 
@@ -221,6 +269,34 @@ def decodepassword(passtoken) :
     key = base64.urlsafe_b64encode(KEYSTR.encode())
     token = passtoken.encode()
     return str(Fernet(key).decrypt(token).decode())
+
+def convertweekday(txt) :
+    txt = txt.replace("Mon", "月")
+    txt = txt.replace("Tue", "火")
+    txt = txt.replace("Wed", "水")
+    txt = txt.replace("Thu", "木")
+    txt = txt.replace("Fri", "金")
+    txt = txt.replace("Sat", "土")
+    txt = txt.replace("Sun", "日")
+    return txt
+
+def sendapplicationmail(member, schedule) :
+    txt = "【個人情報】\r\n"
+    txt += "氏名：" + member.name + "\r\n"
+    txt += "氏名(カナ)：" + member.kana + "\r\n"
+    txt += "個人電話番号：" + member.tel1 + "\r\n"
+    txt += "メールアドレス：" + member.mail + "\r\n"
+    txt += "パスワード：" + decodepassword(member.password) + "\r\n\r\n"
+    txt += "【勤務先情報】\r\n"
+    txt += "勤務先：" + member.organization + "\r\n"
+    txt += "資格、役職：" + member.position + "\r\n"
+    txt += "勤務先電話番号：" + member.tel2 + "\r\n"
+    txt += "都道府県：" + member.prefectures + "\r\n"
+    txt += "規模：" + member.scale + "\r\n"
+    txt += "その他：\r\n" + member.others + "\r\n\r\n"
+    txt += "【明後日より一週間の予定】\r\n"
+    txt += schedule
+    send_mail(MAILSUBJECT, txt, EMAIL_HOST_USER, [MAILADDRESS])
 
 def csvregist(form) :
     form.save()
