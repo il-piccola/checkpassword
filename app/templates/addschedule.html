@@ -1,0 +1,53 @@
+{% load static %}
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" crossorigin="anonymous">
+</head>
+<body class="container">
+    <h1 class="display-4 text-primary">{{title}}</h1>
+    <p>{{msg}}</p>
+    <form action="{% url 'addschedule' %}" method="POST">
+    {% csrf_token %}
+    <table class="table">
+        <tr>
+            <th>月日</th>
+            <th>場所</th>
+            <th>電話番号</th>
+            <th>電話が許される時間</th>
+            <th>電話を取った方に伝える貴方の立場</th>
+        </tr>
+        <tr>
+            <td align="right"><b>例</b></td>
+            <td>湯川クリニック</td>
+            <td>0312345678</td>
+            <td>10:00～12:00　14:00～17:15</td>
+            <td>院長</td>
+        </tr>
+        <tr>
+            <td>{{form.date1}}</td><td>{{form.place1}}</td><td>{{form.tel1}}</td><td>{{form.time1}}</td><td>{{form.position1}}</td>
+        </tr><tr>
+            <td>{{form.date2}}</td><td>{{form.place2}}</td><td>{{form.tel2}}</td><td>{{form.time2}}</td><td>{{form.position2}}</td>
+        </tr><tr>
+            <td>{{form.date3}}</td><td>{{form.place3}}</td><td>{{form.tel3}}</td><td>{{form.time3}}</td><td>{{form.position3}}</td>
+        </tr><tr>
+            <td>{{form.date4}}</td><td>{{form.place4}}</td><td>{{form.tel4}}</td><td>{{form.time4}}</td><td>{{form.position4}}</td>
+        </tr><tr>
+            <td>{{form.date5}}</td><td>{{form.place5}}</td><td>{{form.tel5}}</td><td>{{form.time5}}</td><td>{{form.position5}}</td>
+        </tr><tr>
+            <td>{{form.date6}}</td><td>{{form.place6}}</td><td>{{form.tel6}}</td><td>{{form.time6}}</td><td>{{form.position6}}</td>
+        </tr><tr>
+            <td>{{form.date7}}</td><td>{{form.place7}}</td><td>{{form.tel7}}</td><td>{{form.time7}}</td><td>{{form.position7}}</td>
+        </tr>
+    </table>
+    <table class="table">
+        <tr><td align="center">
+            <input type="submit" value="次へ" class="btn btn-primary mt-2">
+            <button type="button" onclick="history.back()" class="btn btn-primary mt-2">戻る</button>
+        </td></tr>
+    </table>
+    </form>
+</body>
+</html>
