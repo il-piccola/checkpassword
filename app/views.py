@@ -206,9 +206,12 @@ def editmember(request, num) :
     request.session['name'] = request.POST['name']
     request.session['kana'] = request.POST['kana']
     request.session['tel1'] = request.POST['tel1']
-    request.session['tel2'] = request.POST['tel2']
     request.session['organization'] = request.POST['organization']
     request.session['position'] = request.POST['position']
+    request.session['tel2'] = request.POST['tel2']
+    request.session['prefectures'] = request.POST['prefectures']
+    request.session['scale'] = request.POST['scale']
+    request.session['others'] = request.POST['others']
     return redirect(to='editconfirm')
 
 def editconfirm(request) :
@@ -216,11 +219,15 @@ def editconfirm(request) :
     name = request.session['name']
     kana = request.session['kana']
     tel1 = request.session['tel1']
-    tel2 = request.session['tel2']
     organization = request.session['organization']
     position = request.session['position']
-    member = Member(id=obj.id, name=name, kana=kana, mail=obj.mail, tel1=tel1, tel2=tel2
-        , organization=organization, position=position, password=obj.password, approval=obj.approval)
+    tel2 = request.session['tel2']
+    prefectures = request.session['prefectures']
+    scale = request.session['scale']
+    others = request.session['others']
+    member = Member(id=obj.id, name=name, kana=kana, tel1=tel1, mail=obj.mail, password=obj.password
+        , organization=organization, position=position, tel2=tel2, prefectures=prefectures
+        , scale=scale, others=others, approval=obj.approval)
     if (request.method == 'POST') :
         member.save()
         request.session.clear()
