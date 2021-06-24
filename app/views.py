@@ -114,31 +114,28 @@ def addschedule(request) :
     if (request.method != 'POST') :
         params['msg'] = '明後日より一週間の予定を記入してください(日曜日　祝日は不要です)'
         return render(request, 'addschedule.html', params)
-    txt = "月日,場所,電話番号,電話が許される時間,電話を取った方に伝える貴方の立場\r\n"
-    for i in range(1, 8) :
-        if request.POST['date'+str(i)] == "" :
-            txt += "--,"
-        else :
-            pday = datetime.datetime.strptime(request.POST['date'+str(i)], "%Y-%m-%d")
-            sday = convertweekday(datetime.datetime.strftime(pday, "%m月%d日(%a)"))
-            txt += sday+","
-        if request.POST['place'+str(i)] == "" :
-            txt += "--,"
-        else :
-            txt += request.POST['place'+str(i)]+","
-        if request.POST['tel'+str(i)] == "" :
-            txt += "--,"
-        else :
-            txt += request.POST['tel'+str(i)]+","
-        if request.POST['time'+str(i)] == "" :
-            txt += "--,"
-        else :
-            txt += request.POST['time'+str(i)]+","
-        if request.POST['position'+str(i)] == "" :
-            txt += "--\r\n"
-        else :
-            txt += request.POST['position'+str(i)]+"\r\n"
-    request.session['schedule'] = txt
+    date = ["--", "--", "--", "--", "--", "--", "--"]
+    place = ["--", "--", "--", "--", "--", "--", "--"]
+    tel = ["--", "--", "--", "--", "--", "--", "--"]
+    time = ["--", "--", "--", "--", "--", "--", "--"]
+    position = ["--", "--", "--", "--", "--", "--", "--"]
+    for i in range(7) :
+        if request.POST['date'+str(i+1)] != "" :
+            pday = datetime.datetime.strptime(request.POST['date'+str(i+1)], "%Y-%m-%d")
+            date[i] = convertweekday(datetime.datetime.strftime(pday, "%m月%d日(%a)"))
+        if request.POST['place'+str(i+1)] != "" :
+            place[i] = request.POST['place'+str(i+1)]
+        if request.POST['tel'+str(i+1)] != "" :
+            tel[i] = request.POST['tel'+str(i+1)]
+        if request.POST['time'+str(i+1)] != "" :
+            time[i] = request.POST['time'+str(i+1)]
+        if request.POST['position'+str(i+1)] != "" :
+            position[i] = request.POST['position'+str(i+1)]
+    request.session['date'] = date
+    request.session['place'] = place
+    request.session['tel'] = tel
+    request.session['time'] = time
+    request.session['post'] = position
     return redirect(to='addconfirm')
 
 def addconfirm(request) :
@@ -153,12 +150,16 @@ def addconfirm(request) :
     prefectures = request.session['prefectures']
     scale = request.session['scale']
     others = request.session['others']
-    txt = request.session['schedule']
+    date = request.session['date']
+    place = request.session['place']
+    tel = request.session['tel']
+    time = request.session['time']
+    post = request.session['post']
     if (request.method == 'POST') :
         member = Member(name=name, kana=kana, tel1=tel1, mail=mail, password=encodepassword(password)
             , organization=organization, position=position, tel2=tel2, prefectures=prefectures
             , scale=scale, others=others)
-        sendapplicationmail(member, txt)
+        sendapplicationmail(member, date, place, tel, time, post)
         member.save()
         request.session.clear()
         request.session['msg'] = 'ユーザ登録の申し込みを受け付けました。こちらからの電話確認をお待ちください。'
@@ -170,7 +171,11 @@ def addconfirm(request) :
         'title' : 'Confirmation',
         'msg' : '以下の通りユーザ登録を申し込みます',
         'data' : data,
-        'schedule' : txt,
+        'date' : date,
+        'place' : place,
+        'tel' : tel,
+        'time' : time,
+        'post' : post,
     }
     return render(request, 'addconfirm.html', params)
 
@@ -287,7 +292,7 @@ def convertweekday(txt) :
     txt = txt.replace("Sun", "日")
     return txt
 
-def sendapplicationmail(member, schedule) :
+def sendapplicationmail(member, date, place, tel, time, post) :
     txt = "【個人情報】\r\n"
     txt += "氏名：" + member.name + "\r\n"
     txt += "氏名(カナ)：" + member.kana + "\r\n"
@@ -302,7 +307,9 @@ def sendapplicationmail(member, schedule) :
     txt += "規模：" + member.scale + "\r\n"
     txt += "その他：\r\n" + member.others + "\r\n\r\n"
     txt += "【明後日より一週間の予定】\r\n"
-    txt += schedule
+    txt += "月日,場所,電話番号,電話が許される時間,電話を取った方に伝える貴方の立場\r\n"
+    for i in range(7) :
+        txt += date[i] + "," + place[i] + "," + tel[i] + "," + time[i] + "," + post[i] + "\r\n"
     send_mail(MAILSUBJECT, txt, EMAIL_HOST_USER, [MAILADDRESS])
 
 def csvregist(form) :

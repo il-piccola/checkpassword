@@ -27,7 +27,30 @@
         <tr><th>その他</th><td>{{data.others | linebreaksbr}}</td></tr>
     </table>
     <table class="table">
-        <tr><td>{{schedule | linebreaksbr}}</td></tr>
+        <tr>
+            <th>月日</th>
+            <th>場所</th>
+            <th>電話番号</th>
+            <th>電話が許される時間</th>
+            <th>電話を取った方に伝える貴方の立場</th>
+        </tr>
+        <tr>
+            <td>{{date.0}}</td><td>{{place.0}}</td><td>{{tel.0}}</td><td>{{time.0}}</td><td>{{post.0}}</td>
+        </tr><tr>
+            <td>{{date.1}}</td><td>{{place.1}}</td><td>{{tel.1}}</td><td>{{time.1}}</td><td>{{post.1}}</td>
+        </tr><tr>
+            <td>{{date.2}}</td><td>{{place.2}}</td><td>{{tel.2}}</td><td>{{time.2}}</td><td>{{post.2}}</td>
+        </tr><tr>
+            <td>{{date.3}}</td><td>{{place.3}}</td><td>{{tel.3}}</td><td>{{time.3}}</td><td>{{post.3}}</td>
+        </tr><tr>
+            <td>{{date.4}}</td><td>{{place.4}}</td><td>{{tel.4}}</td><td>{{time.4}}</td><td>{{post.4}}</td>
+        </tr><tr>
+            <td>{{date.5}}</td><td>{{place.5}}</td><td>{{tel.5}}</td><td>{{time.5}}</td><td>{{post.5}}</td>
+        </tr><tr>
+            <td>{{date.6}}</td><td>{{place.6}}</td><td>{{tel.6}}</td><td>{{time.6}}</td><td>{{post.6}}</td>
+        </tr>
+    </table>
+    <table class="table">
         <tr><td align="center">
             <input type="submit" value="登録" class="btn btn-primary mt-2">
             <button type="button" onclick="history.back()" class="btn btn-primary mt-2">戻る</button>
