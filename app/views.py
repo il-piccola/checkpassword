@@ -123,7 +123,7 @@ def addschedule(request) :
         if request.POST['date'+str(i+1)] != "" :
             pday = datetime.datetime.strptime(request.POST['date'+str(i+1)], "%Y-%m-%d")
             # date[i] = convertweekday(datetime.datetime.strftime(pday, "%m月%d日(%a)"))
-            date[i] = datetime.datetime.strftime(pday, "%m/%d(%a)")
+            date[i] = convertweekday(datetime.datetime.strftime(pday, "%m/%d(%a)"))
             # date[i] = request.POST['date'+str(i+1)]
         if request.POST['place'+str(i+1)] != "" :
             place[i] = request.POST['place'+str(i+1)]
