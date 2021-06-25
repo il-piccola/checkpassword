@@ -9,7 +9,7 @@
 <body class="container">
     <h1 class="display-4 text-primary">{{title}}</h1>
     <p>{{msg}}</p>
-    <div align="right"><a href="{% url 'addmember' %}">ユーザ登録申込</a></div>
+    <div align="right"><a href="{% url 'addmember' %}">ユーザ登録申込</a><br><a href="{% url 'changepassword' %}">パスワード変更</a></div>
     <form action="{% url 'login' %}" method="POST">
     {% csrf_token %}
     <table class="table">

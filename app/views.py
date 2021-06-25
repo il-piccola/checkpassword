@@ -245,6 +245,39 @@ def editconfirm(request) :
     }
     return render(request, 'editconfirm.html', params)
 
+def changepassword(request) :
+    params = {
+        'title' : 'Change Password',
+        'msg' : '',
+        'form' : MemberForm(),
+    }
+    if (request.method != 'POST') :
+        params['msg'] = 'パスワードを変更します'
+        return render(request, 'changepassword.html', params)
+    mail = request.POST['mail']
+    if not Member.objects.filter(mail=mail).exists() :
+        params['msg'] = '入力されたメールアドレスは存在しません、メールアドレスを確認してください'
+        return render(request, 'changepassword.html', params)
+    member = Member.objects.get(mail=mail)
+    params['form'] = MemberForm(data=request.POST, instance=member)
+    if decodepassword(member.password) != request.POST['password'] :
+        params['msg'] = 'パスワード(旧)が間違っています、パスワードを確認してください'
+        return render(request, 'changepassword.html', params)
+    if request.POST['newpass'] != request.POST['chkpass'] :
+        params['msg'] = 'パスワード(新)がパスワード(確認)と一致しません、入力し直してください'
+        return render(request, 'changepassword.html', params)
+    if len(request.POST['newpass']) < 6 :
+        params['msg'] = 'パスワードは6文字以上にしてください'
+        return render(request, 'changepassword.html', params)
+    member.password = encodepassword(request.POST['newpass'])
+    member.save()
+    params = {
+        'title' : 'Login',
+        'msg' : 'パスワードは更新されました',
+        'form' : LoginForm(),
+    }
+    return render(request, 'login.html', params)
+
 def delmember(request, num) :
     obj = Member.objects.get(id=num)
     if (request.method == 'POST') :
