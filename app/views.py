@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
+from io import BytesIO
+from django.http import HttpResponse
 from django.db.models import Q
 from django.core.mail import send_mail
 from cryptography.fernet import Fernet
+import pandas as pd
 import os
 import csv
 import base64
@@ -289,6 +292,42 @@ def delmember(request, num) :
         'data' : obj,
     }
     return render(request, 'delmember.html', params)
+
+def downloadexcel(request) :
+    members = Member.objects.all()
+    lines = []
+    for member in members :
+        line = []
+        line.append(member.name)
+        line.append(member.kana)
+        line.append(member.tel1)
+        line.append(member.mail)
+        line.append(decodepassword(member.password))
+        line.append(member.organization)
+        line.append(member.position)
+        line.append(member.tel2)
+        line.append(member.prefectures)
+        line.append(member.scale)
+        line.append(member.others)
+        line.append(member.time.strftime('%Y/%m/%d %H:%M:%S'))
+        if (member.approval == 1) :
+            line.append("承認済")
+        else :
+            line.append("未承認")
+        lines.append(line)
+    df = pd.DataFrame(lines)
+    df.columns = ["氏名", "氏名(カナ)", "個人電話番号", "メールアドレス", "パスワード", "勤務先", "資格、役職", "勤務先電話番号", "都道府県", "規模", "その他", "時刻", "承認"]
+    with BytesIO() as b:
+        writer = pd.ExcelWriter(b, engine='xlsxwriter')
+        df.to_excel(writer, sheet_name='master')
+        writer.save()
+        filename = 'master.xlsx'
+        response = HttpResponse(
+            b.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        return response
 
 def addfromcsv(request) :
     params = {

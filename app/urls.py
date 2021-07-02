@@ -28,6 +28,7 @@ urlpatterns = [
     path('editconfirm/', views.editconfirm, name='editconfirm'),
     path('changepassword/', views.changepassword, name='changepassword'),
     path('delmember/<int:num>', views.delmember, name='delmember'),
+    path('downloadexcel', views.downloadexcel, name='downloadexcel'),
     path('addfromcsv/', views.addfromcsv, name='addfromcsv'),
     path('login/', views.login, name='login'),
 ]

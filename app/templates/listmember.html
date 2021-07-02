@@ -8,12 +8,15 @@
 </head>
 <body class="container">
     <h1 class="display-4 text-primary">{{title}}</h1>
+    <table class="table"><tr><td>
     <form action="{% url 'listmember' %}" method="POST" class="form-inline">
     {% csrf_token %}
         　　<b>検索</b>　　{{ form.search }}
         　　<b>ソート</b>　　{{ form.order }}{{ form.reverse }}
         　　<input type="submit" value="click" class="btn btn-primary mt-2">
     </form>
+    </td><td align="right"><a href="{% url 'downloadexcel' %}">excelダウンロード</a></td></tr>
+    </table>
     <table class="table">
         <!--
         <tr>
